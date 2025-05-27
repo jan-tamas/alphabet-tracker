@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alphabet Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f3f4f6; /* Light gray background */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .letter-grid {
+            display: grid;
+            /* 3 columns, 9 rows for 27 items (26 letters + 1 reset) */
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-rows: repeat(9, auto);
+            grid-auto-flow: column; /* Fill column by column */
+            gap: 8px; /* Spacing between letters */
+            max-width: 320px; /* Max width for the grid, adjusted slightly */
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .letter-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px; /* Wider than tall padding */
+            font-size: 1.25rem; /* Adjusted font size */
+            font-weight: bold;
+            color: white;
+            border-radius: 8px; /* Rounded corners */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+            min-height: 48px; /* Ensure a minimum height for cells */
+        }
+        .unchecked {
+            background-color: #4ade80; /* Green */
+        }
+        .checked {
+            background-color: #f87171; /* Red */
+        }
+        .reset-button-cell {
+            background-color: #60a5fa; /* Blue for reset */
+        }
+        .app-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937; /* Dark gray text */
+            margin-bottom: 24px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="app-title">Alphabet Tracker</h1>
+    <div id="alphabetGrid" class="letter-grid">
+        </div>
+
+    <script>
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const grid = document.getElementById('alphabetGrid');
+
+        // Initialize letters
+        function initializeLetters() {
+            grid.innerHTML = ''; // Clear existing letters
+
+            // Add letter cells
+            for (let i = 0; i < alphabet.length; i++) {
+                const letter = alphabet[i];
+                const cell = document.createElement('div');
+                cell.classList.add('letter-cell', 'unchecked');
+                cell.textContent = letter;
+                cell.dataset.letter = letter; // Store the letter
+                cell.dataset.state = 'unchecked'; // Initial state
+
+                // Add event listener for toggling state
+                cell.addEventListener('click', () => {
+                    toggleLetterState(cell);
+                });
+                grid.appendChild(cell);
+            }
+
+            // Add Reset button - it will flow as the 27th item
+            const resetButton = document.createElement('div');
+            resetButton.classList.add('letter-cell', 'reset-button-cell');
+            resetButton.textContent = 'Reset'; // Changed from "Reset All"
+            resetButton.id = 'resetAll';
+            resetButton.addEventListener('click', () => {
+                resetAllLetters();
+            });
+            grid.appendChild(resetButton);
+        }
+
+        // Function to toggle letter state
+        function toggleLetterState(cell) {
+            if (cell.dataset.state === 'unchecked') {
+                cell.dataset.state = 'checked';
+                cell.classList.remove('unchecked');
+                cell.classList.add('checked');
+            } else {
+                cell.dataset.state = 'unchecked';
+                cell.classList.remove('checked');
+                cell.classList.add('unchecked');
+            }
+        }
+
+        // Function to reset all letters to unchecked (green)
+        function resetAllLetters() {
+            const cells = grid.querySelectorAll('.letter-cell');
+            cells.forEach(cell => {
+                // Only reset actual letters, not the reset button itself (though it won't have dataset.letter)
+                if (cell.dataset.letter) { // Check if it's a letter cell
+                    cell.dataset.state = 'unchecked';
+                    cell.classList.remove('checked');
+                    cell.classList.add('unchecked');
+                }
+            });
+        }
+
+        // Initial setup
+        initializeLetters();
+    </script>
+</body>
+</html>
