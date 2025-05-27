@@ -1,8 +1,8 @@
 const CACHE_NAME = 'alphabet-tracker-cache-v1';
 const urlsToCache = [
-  '/', // This will cache the root, often index.html
-  '/index.html', // Explicitly cache index.html
-  '/manifest.json', // Cache the manifest file
+  './', // This will cache the root, as a relative path
+  './index.html', // Explicitly cache index.html with relative path
+  './manifest.json', // Cache the manifest file with relative path
   // Since we're using a base64 encoded icon directly in HTML, 
   // we don't need to cache separate icon files
 ];
