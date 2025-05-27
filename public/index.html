@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alphabet Tracker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: sans-serif; /* Changed to standard sans-serif font for offline compatibility */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -45,18 +44,18 @@
             min-height: 48px; /* Ensure a minimum height for cells */
         }
         .unchecked {
-            background-color: #4ade80; /* Green */
+            background-color: #4CAF50; /* Green - slightly adjusted for common hex */
         }
         .checked {
-            background-color: #f87171; /* Red */
+            background-color: #F44336; /* Red - slightly adjusted for common hex */
         }
         .reset-button-cell {
-            background-color: #60a5fa; /* Blue for reset */
+            background-color: #2196F3; /* Blue - slightly adjusted for common hex */
         }
         .app-title {
             font-size: 2rem;
             font-weight: bold;
-            color: #1f2937; /* Dark gray text */
+            color: #333; /* Dark gray text - slightly adjusted for common hex */
             margin-bottom: 24px;
             text-align: center;
         }
@@ -94,7 +93,7 @@
             // Add Reset button - it will flow as the 27th item
             const resetButton = document.createElement('div');
             resetButton.classList.add('letter-cell', 'reset-button-cell');
-            resetButton.textContent = 'Reset'; // Changed from "Reset All"
+            resetButton.textContent = 'Reset';
             resetButton.id = 'resetAll';
             resetButton.addEventListener('click', () => {
                 resetAllLetters();
@@ -119,7 +118,7 @@
         function resetAllLetters() {
             const cells = grid.querySelectorAll('.letter-cell');
             cells.forEach(cell => {
-                // Only reset actual letters, not the reset button itself (though it won't have dataset.letter)
+                // Only reset actual letters, not the reset button itself
                 if (cell.dataset.letter) { // Check if it's a letter cell
                     cell.dataset.state = 'unchecked';
                     cell.classList.remove('checked');
