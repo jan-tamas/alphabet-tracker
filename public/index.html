@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="description" content="Track letters of the alphabet with a simple toggle interface">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAABtElEQVRYCe1WO07DQBCdWedDQqIBCUFBQUVJQ0GXA3AGbsEluAYSJ6DDnAApLS0SBQUFEh8Zm5k4u7ZDnJhNkYJIK43fzs7Mm/FubEzwCRRcgOu8yG/Y9P+I/lBmwP/4nkrKmqb5TiWvw12v1/A8j1qtViIXx1H6dDqFsRb9fh/T6RSz2Sw9D4IAy+US2+0Wh8OBlKPdbuPxNEV3+RJr6XR6FbEqR5Mh/vr9DsfjEWEYQikFawyMtdAyT8o25COQyEmUENftdlOxcRwnxHIwrWutpdxp65DH1O/1elitVtjtdnQh1NHo53AwGODrWOFy7jCsOcowKoNb8QGOQFVrsjhCm80GURTR9YltNpsRudwlRXuScEPRfRMCeZ6HwWCAdrsdz0MZ6LNcLiccaHJ+7Hf8p0ggAqyXZ4Ew0Ot0Ouh0OhRtHMdIX9xGKJWTZxXhXE6sgCEfMQRcF+v1OvFHmvPR84aUe57AcrnEZrNJwtDv9xFFUaVHXJ5n2eR5QswHT3+Ky+Ui5UIsiUwI6CdxLjP3RSCPA5LLRqCGGTjGRYt1hzNwfHMxu2YEahaBX4UH13rJg+FRAAAAAElFTkSuQmCC">
     <title>Alphabet Tracker</title>
     <style>
         body {
@@ -66,9 +72,41 @@
     <div id="alphabetGrid" class="letter-grid">
         </div>
 
+    <div id="offlineIndicator" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #333; color: white; padding: 10px 20px; border-radius: 5px; z-index: 100;">
+        You are offline
+    </div>
+
     <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // Monitor online/offline status
+        function updateOnlineStatus() {
+            const offlineIndicator = document.getElementById('offlineIndicator');
+            if (navigator.onLine) {
+                offlineIndicator.style.display = 'none';
+            } else {
+                offlineIndicator.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus(); // Initial check
+
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const grid = document.getElementById('alphabetGrid');
+        const STORAGE_KEY = 'alphabet-tracker-state';
 
         // Initialize letters
         function initializeLetters() {
@@ -112,6 +150,7 @@
                 cell.classList.remove('checked');
                 cell.classList.add('unchecked');
             }
+            saveState();
         }
 
         // Function to reset all letters to unchecked (green)
@@ -125,10 +164,69 @@
                     cell.classList.add('unchecked');
                 }
             });
+            saveState();
         }
 
-        // Initial setup
-        initializeLetters();
+        // Save the current state to localStorage
+        function saveState() {
+            try {
+                const stateObj = {};
+                const cells = grid.querySelectorAll('.letter-cell');
+                cells.forEach(cell => {
+                    if (cell.dataset.letter) {
+                        stateObj[cell.dataset.letter] = cell.dataset.state;
+                    }
+                });
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(stateObj));
+            } catch (error) {
+                console.error('Error saving state:', error);
+            }
+        }
+
+        // Load state from localStorage
+        function loadState() {
+            try {
+                const savedState = localStorage.getItem(STORAGE_KEY);
+                if (!savedState) return false;
+                
+                const stateObj = JSON.parse(savedState);
+                const cells = grid.querySelectorAll('.letter-cell');
+                
+                cells.forEach(cell => {
+                    if (cell.dataset.letter && stateObj[cell.dataset.letter]) {
+                        const savedCellState = stateObj[cell.dataset.letter];
+                        cell.dataset.state = savedCellState;
+                        
+                        if (savedCellState === 'checked') {
+                            cell.classList.remove('unchecked');
+                            cell.classList.add('checked');
+                        } else {
+                            cell.classList.remove('checked');
+                            cell.classList.add('unchecked');
+                        }
+                    }
+                });
+                
+                return true;
+            } catch (error) {
+                console.error('Error loading state:', error);
+                return false;
+            }
+        }
+
+        // Initialize app
+        function initApp() {
+            initializeLetters();
+            
+            // Try to load saved state
+            const stateLoaded = loadState();
+            if (!stateLoaded) {
+                console.log('No saved state found, using default state');
+            }
+        }
+
+        // Initialize the app
+        initApp();
     </script>
 </body>
 </html>
