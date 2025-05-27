@@ -7,6 +7,7 @@
     <meta name="description" content="Track letters of the alphabet with a simple toggle interface">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="canonical" href="https://jan-tamas.github.io/alphabet-tracker/">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAABtElEQVRYCe1WO07DQBCdWedDQqIBCUFBQUVJQ0GXA3AGbsEluAYSJ6DDnAApLS0SBQUFEh8Zm5k4u7ZDnJhNkYJIK43fzs7Mm/FubEzwCRRcgOu8yG/Y9P+I/lBmwP/4nkrKmqb5TiWvw12v1/A8j1qtViIXx1H6dDqFsRb9fh/T6RSz2Sw9D4IAy+US2+0Wh8OBlKPdbuPxNEV3+RJr6XR6FbEqR5Mh/vr9DsfjEWEYQikFawyMtdAyT8o25COQyEmUENftdlOxcRwnxHIwrWutpdxp65DH1O/1elitVtjtdnQh1NHo53AwGODrWOFy7jCsOcowKoNb8QGOQFVrsjhCm80GURTR9YltNpsRudwlRXuScEPRfRMCeZ6HwWCAdrsdz0MZ6LNcLiccaHJ+7Hf8p0ggAqyXZ4Ew0Ot0Ouh0OhRtHMdIX9xGKJWTZxXhXE6sgCEfMQRcF+v1OvFHmvPR84aUe57AcrnEZrNJwtDv9xFFUaVHXJ5n2eR5QswHT3+Ky+Ui5UIsiUwI6CdxLjP3RSCPA5LLRqCGGTjGRYt1hzNwfHMxu2YEahaBX4UH13rJg+FRAAAAAElFTkSuQmCC">
     <title>Alphabet Tracker</title>
@@ -80,7 +81,9 @@
         // Register Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
+                navigator.serviceWorker.register('service-worker.js', {
+                    scope: self.location.pathname
+                })
                     .then(registration => {
                         console.log('Service Worker registered with scope:', registration.scope);
                     })
